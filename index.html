@@ -10,12 +10,13 @@
 <body>
     <div class="main-wrapper">
         <aside class="sidebar">
-            <div class="sidebar-header">📚 Navigation</div>
+            <div class="sidebar-header">StudyPlan</div>
             <nav class="sidebar-nav">
                 <button class="nav-btn active" onclick="showSection(event, 'dashboard')">📊 Dashboard</button>
-                <button class="nav-btn" onclick="showSection(event, 'subject')">📖 Subject Management</button>
-                <button class="nav-btn" onclick="showSection(event, 'schedule')">📅 Schedule Planner</button>
+                <button class="nav-btn" onclick="showSection(event, 'subject')">📖 Subject's</button>
+                <button class="nav-btn" onclick="showSection(event, 'schedule')">📅 Schedule</button>
                 <button class="nav-btn" onclick="showSection(event, 'task')">✓ Task Manager</button>
+                <button class="nav-btn" onclick="showSection(event, 'analytics')">📈 Analytics</button>
             </nav>
             <div class="sidebar-footer">
                 <button onclick="toggleTheme()">Theme</button>
@@ -29,90 +30,198 @@
                 <p>Simple & Easy Planner</p>
             </header>
 
-    <section>
-        <h2>Dashboard Overview</h2>
-        <div class="dashboard">
-            <div class="card">
-                <div class="number" id="subCount">0</div>
-                <div>Subjects</div>
-            </div>
-            <div class="card">
-                <div class="number" id="taskCount">0</div>
-                <div>Pending Tasks</div>
-            </div>
-            <div class="card">
-                <div class="number" id="schedCount">0</div>
-                <div>Schedules</div>
-            </div>
-            <div class="card">
-                <div class="number" id="completedCount">0</div>
-                <div>Completed</div>
-            </div>
-        </div>
-        <div id="deadlineAlerts"></div>
-        <p><b>Today's Schedule:</b></p>
-        <ul id="today"></ul>
-    </section>
-
-    <div>
-        <section>
-            <h2>Subject Management</h2>
-            <input id="subject" placeholder="Subject Name" />
-            <select id="priority">
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-            </select>
-            <input id="subjectNotes" placeholder="Notes (optional)" />
-            <button onclick="addSubject()">Add Subject</button>
-            <ul id="subjectList"></ul>
-        </section>
-
-        <section>
-            <h2>Schedule Planner</h2>
+            <section>
+                <h2>Dashboard Overview</h2>
+                <div class="dashboard">
+                    <div class="card">
+                        <div class="number" id="subCount">0</div>
+                        <div>Subjects</div>
+                    </div>
+                    <div class="card">
+                        <div class="number" id="taskCount">0</div>
+                        <div>Pending Tasks</div>
+                    </div>
+                    <div class="card">
+                        <div class="number" id="schedCount">0</div>
+                        <div>Schedules</div>
+                    </div>
+                    <div class="card">
+                        <div class="number" id="completedCount">0</div>
+                        <div>Completed</div>
+                    </div>
+                </div>
+                <h3 style="margin-top: 20px; color: #6b46c1;">⚠️ Upcoming Alerts</h3>
+                <div id="deadlineAlerts"></div>
+                <p><b>Today's Schedule:</b></p>
+                <ul id="today"></ul>
+            </section>
 
             <div>
-                <select id="day">
-                    <option>Monday</option>
-                    <option>Tuesday</option>
-                    <option>Wednesday</option>
-                    <option>Thursday</option>
-                    <option>Friday</option>
-                    <option>Saturday</option>
-                    <option>Sunday</option>
-                </select>
-                <input type="time" id="time" />
-                <input type="time" id="endTime" placeholder="End Time" />
-                <input placeholder="Subject" id="schedSub" />
-                <button onclick="addSchedule()">Add Schedule</button>
-                <div id="conflictWarning"></div>
-                <ul id="scheduleList"></ul>
-            </div>
+                <section>
+                    <h2>Subject Management</h2>
+                    <div class="input-row">
+                        <input id="subject" placeholder="Subject Name" />
+                        <select id="priority">
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                        <input id="subjectNotes" placeholder="Notes (optional)" />
+                        <button onclick="addSubject()">Add Subject</button>
+                    </div>
+                    <table id="subjectTable">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Priority</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectList"></tbody>
+                    </table>
+                </section>
 
-            <div>
-                <p class="small">Weekly Overview:</p>
-                <ul id="weeklyView"></ul>
-            </div>
-        </section>
+                <section>
+                    <h2>Schedule Planner</h2>
 
-        <section>
-            <h2>Task Manager</h2>
-            <input placeholder="Assignment / Exam" id="task" />
-            <select id="taskType">
-                <option>Assignment</option>
-                <option>Exam</option>
-                <option>Project</option>
-                <option>Quiz</option>
-            </select>
-            <input type="date" id="date" />
-            <select id="taskPriority">
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-            </select>
-            <button onclick="addTask()">Add Task</button>
-            <ul id="taskList"></ul>
-        </section>
+                    <div class="input-row">
+                        <select id="day">
+                            <option>Monday</option>
+                            <option>Tuesday</option>
+                            <option>Wednesday</option>
+                            <option>Thursday</option>
+                            <option>Friday</option>
+                            <option>Saturday</option>
+                            <option>Sunday</option>
+                        </select>
+                        <input type="time" id="time" />
+                        <input type="time" id="endTime" placeholder="End Time" />
+                        <input placeholder="Subject" id="schedSub" />
+                        <button onclick="addSchedule()">Add Schedule</button>
+                    </div>
+                    <div id="conflictWarning"></div>
+                    <table id="scheduleTable">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Subject</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleList"></tbody>
+                    </table>
+
+                    <div>
+                        <p class="small">Weekly Overview:</p>
+                        <ul id="weeklyView"></ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Task Manager</h2>
+                    <div class="input-row">
+                        <input placeholder="Assignment / Exam" id="task" />
+                        <select id="taskType">
+                            <option>Assignment</option>
+                            <option>Exam</option>
+                            <option>Project</option>
+                            <option>Quiz</option>
+                        </select>
+                        <input type="date" id="date" />
+                        <select id="taskPriority">
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                        <button onclick="addTask()">Add Task</button>
+                    </div>
+                    <table id="taskTable">
+                        <thead>
+                            <tr>
+                                <th>Task</th>
+                                <th>Type</th>
+                                <th>Due Date</th>
+                                <th>Priority</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="taskList"></tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <h2>Progress Analytics</h2>
+                    <p class="analytics-desc">Track your study progress with visual insights on task completion and
+                        priority distribution.</p>
+
+                    <div class="analytics-container">
+                        <!-- Donut Chart Section -->
+                        <div class="analytics-box">
+                            <h3>📊 Task Completion Status</h3>
+                            <div class="donut-chart-container">
+                                <svg class="donut-chart" viewBox="0 0 200 200">
+                                    <circle class="donut-ring" cx="100" cy="100" r="80" fill="transparent"
+                                        stroke="#e5e7eb" stroke-width="40"></circle>
+                                    <circle id="donutSegment" class="donut-segment" cx="100" cy="100" r="80"
+                                        fill="transparent" stroke="#10b981" stroke-width="40" stroke-dasharray="0 502.4"
+                                        stroke-dashoffset="125.6" transform="rotate(-90 100 100)"></circle>
+                                    <text x="100" y="95" text-anchor="middle" class="donut-percent"
+                                        id="donutPercent">0%</text>
+                                    <text x="100" y="115" text-anchor="middle" class="donut-label">Complete</text>
+                                </svg>
+                                <div class="donut-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-color completed"></span>
+                                        <span class="legend-text"><span id="completedTaskCount">0</span>
+                                            Completed</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color pending"></span>
+                                        <span class="legend-text"><span id="pendingTaskCount">0</span> Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Priority Breakdown Section -->
+                        <div class="analytics-box">
+                            <h3>🎯 Priority-wise Task Status</h3>
+                            <table class="priority-table">
+                                <thead>
+                                    <tr>
+                                        <th>Priority</th>
+                                        <th>Completed</th>
+                                        <th>Pending</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="priorityBreakdown">
+                                    <tr>
+                                        <td><span class="priority-badge high">High</span></td>
+                                        <td id="highCompleted">0</td>
+                                        <td id="highPending">0</td>
+                                        <td id="highTotal">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="priority-badge medium">Medium</span></td>
+                                        <td id="mediumCompleted">0</td>
+                                        <td id="mediumPending">0</td>
+                                        <td id="mediumTotal">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="priority-badge low">Low</span></td>
+                                        <td id="lowCompleted">0</td>
+                                        <td id="lowPending">0</td>
+                                        <td id="lowTotal">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
         </main>
     </div>
 
