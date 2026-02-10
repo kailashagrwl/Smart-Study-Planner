@@ -1,6 +1,7 @@
 const subjects = JSON.parse(localStorage.getItem("subjects")) || [];
 const schedules = JSON.parse(localStorage.getItem("schedules")) || [];
 const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+const completedTasks = JSON.parse(localStorage.getItem("completedTasks")) || [];
 let completedCount = Number(localStorage.getItem("completed")) || 0;
 
 const preferences =
@@ -12,8 +13,7 @@ if (preferences.theme === "dark") {
     document.body.classList.add("dark");
 }
 
-// Initialize: Hide all sections except the first one
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function () {
     const allSections = document.querySelectorAll('section');
     allSections.forEach((s, index) => {
         s.style.display = index === 0 ? 'block' : 'none';
@@ -25,10 +25,10 @@ function showSection(event, section) {
 
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
-    
+
     const allSections = document.querySelectorAll('section');
     allSections.forEach(s => s.style.display = 'none');
-    
+
     if (section === 'dashboard') {
         allSections[0].style.display = 'block';
     } else if (section === 'subject') {
@@ -37,6 +37,9 @@ function showSection(event, section) {
         allSections[2].style.display = 'block';
     } else if (section === 'task') {
         allSections[3].style.display = 'block';
+    } else if (section === 'analytics') {
+        allSections[4].style.display = 'block';
+        updateAnalytics();
     }
 }
 
@@ -80,18 +83,17 @@ function deleteSubject(id) {
 function renderSubjects() {
     subjectList.innerHTML = "";
     subjects.forEach((sub) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-    <span>
-      <b>${sub.name}</b> (${sub.priority})
-      ${sub.notes ? `<br><small>${sub.notes}</small>` : ""}
-    </span>
-    <div>
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+    <td><b>${sub.name}</b></td>
+    <td>${sub.priority}</td>
+    <td>${sub.notes || '-'}</td>
+    <td>
       <button class="edit" onclick="editSubject(${sub.id})">Edit</button>
       <button class="delete" onclick="deleteSubject(${sub.id})">Delete</button>
-    </div>
+    </td>
   `;
-        subjectList.appendChild(li);
+        subjectList.appendChild(tr);
     });
     subCount.innerText = subjects.length;
 }
@@ -155,15 +157,17 @@ function renderSchedule() {
     ];
     schedules.forEach((s) => {
         const timeRange = s.end ? `${s.start} - ${s.end}` : s.start;
-        const li = document.createElement("li");
-        li.innerHTML = `
-    <span>
-      <b>${s.day}</b> ${timeRange}
-      <br><small>${s.subject}</small>
-    </span>
-    <button class="delete" onclick="deleteSchedule(${s.id})">Delete</button>
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+    <td><b>${s.day}</b></td>
+    <td>${s.start}</td>
+    <td>${s.end || '-'}</td>
+    <td>${s.subject}</td>
+    <td>
+      <button class="delete" onclick="deleteSchedule(${s.id})">Delete</button>
+    </td>
   `;
-        scheduleList.appendChild(li);
+        scheduleList.appendChild(tr);
         if (s.day === todayName) {
             today.innerHTML += `<li>${timeRange} - ${s.subject}</li>`;
         }
@@ -194,6 +198,18 @@ function addTask() {
     saveData();
     renderTasks();
 }
+function completeTask(id) {
+    if (!confirm("Mark this task as completed?")) return;
+    const index = tasks.findIndex((t) => t.id === id);
+    const completedTask = tasks[index];
+    completedTasks.push(completedTask);
+    tasks.splice(index, 1);
+    completedCount++;
+    saveData();
+    renderTasks();
+    completedCount_elem.innerText = completedCount;
+}
+
 function deleteTask(id) {
     if (!confirm("Delete this task?")) return;
     const index = tasks.findIndex((t) => t.id === id);
@@ -211,18 +227,21 @@ function renderTasks() {
         const daysLeft = Math.ceil(
             (taskDate - todayDate) / (1000 * 60 * 60 * 24),
         );
-        const li = document.createElement("li");
-        if (daysLeft < 0) li.className = "deadline-overdue";
-        else if (daysLeft <= 3) li.className = "deadline-soon";
+        const tr = document.createElement("tr");
+        if (daysLeft < 0) tr.className = "deadline-overdue";
+        else if (daysLeft <= 3) tr.className = "deadline-soon";
 
-        li.innerHTML = `
-    <span>
-      <b>${t.name}</b> (${t.type})
-      <br><small>${t.date} - ${t.priority} Priority</small>
-    </span>
-    <button class="delete" onclick="deleteTask(${t.id})">Delete</button>
+        tr.innerHTML = `
+    <td><b>${t.name}</b></td>
+    <td>${t.type}</td>
+    <td>${t.date}</td>
+    <td>${t.priority}</td>
+    <td>
+      <button class="edit" onclick="completeTask(${t.id})">Complete</button>
+      <button class="delete" onclick="deleteTask(${t.id})">Delete</button>
+    </td>
   `;
-        taskList.appendChild(li);
+        taskList.appendChild(tr);
     });
     taskCount.innerText = tasks.length;
     showDeadlineAlerts();
@@ -260,9 +279,18 @@ function saveData() {
     localStorage.setItem("subjects", JSON.stringify(subjects));
     localStorage.setItem("schedules", JSON.stringify(schedules));
     localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("completedTasks", JSON.stringify(completedTasks));
     localStorage.setItem("completed", completedCount);
     localStorage.setItem("preferences", JSON.stringify(preferences));
 }
+
+
+function updateAnalytics() { const t = completedCount + tasks.length, r = t > 0 ? Math.round(completedCount / t * 100) : 0, e = document.getElementById("donutPercent"); e && (e.textContent = r + "%"); const n = document.getElementById("donutSegment"); if (n) { const t = 502.4 - r / 100 * 502.4; n.setAttribute("stroke-dasharray", "502.4 502.4"), n.setAttribute("stroke-dashoffset", t) } const o = document.getElementById("completedTaskCount"), a = document.getElementById("pendingTaskCount"); o && (o.textContent = completedCount), a && (a.textContent = tasks.length); const s = { High: { completed: 0, pending: 0 }, Medium: { completed: 0, pending: 0 }, Low: { completed: 0, pending: 0 } }; completedTasks.forEach(t => { s[t.priority] && s[t.priority].completed++ }), tasks.forEach(t => { s[t.priority] && s[t.priority].pending++ }), ["High", "Medium", "Low"].forEach(t => { const r = document.getElementById(t.toLowerCase() + "Completed"), e = document.getElementById(t.toLowerCase() + "Pending"), n = document.getElementById(t.toLowerCase() + "Total"), o = s[t].completed, a = s[t].pending; r && (r.textContent = o), e && (e.textContent = a), n && (n.textContent = o + a) }) }
+
+
+const completedCount_elem = document.getElementById('completedCount');
+completedCount_elem.innerText = completedCount;
+
 renderSubjects();
 renderSchedule();
 renderTasks();
